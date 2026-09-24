@@ -1,0 +1,50 @@
+name: current_djia_2026_08_31_backfilled
+kind: market_panel
+source: yfinance
+start: "1990-01-01"
+end: "2026-09-01"
+expected_common_start: "2008-03-19"
+expected_common_end: "2026-08-31"
+universe_condition: current_djia_2026_08_31_backfilled
+membership_source: "https://press.spglobal.com/2026-06-23-Alphabet-Set-to-Join-and-Honeywell-International-to-Remain-in-Dow-Jones-Industrial-Average"
+membership_source_publisher: "S&P Dow Jones Indices"
+membership_source_published: "2026-06-23"
+membership_effective_date: "2026-06-29"
+membership_as_of: "2026-08-31"
+membership_verified_on: "2026-09-21"
+membership_change:
+  addition: GOOGL
+  deletion: VZ
+  effective_timing: before_market_open
+membership_basis: "Official index-provider announcement, not the dynamic FinRL ticker list"
+tickers:
+  - AXP
+  - AMGN
+  - AMZN
+  - AAPL
+  - BA
+  - CAT
+  - CSCO
+  - CVX
+  - GS
+  - HD
+  - HON
+  - IBM
+  - JNJ
+  - KO
+  - JPM
+  - MCD
+  - MMM
+  - MRK
+  - MSFT
+  - NVDA
+  - NKE
+  - PG
+  - TRV
+  - UNH
+  - CRM
+  - GOOGL
+  - V
+  - WMT
+  - DIS
+  - SHW

@@ -1,0 +1,56 @@
+algorithm: ppo
+backend: sbx_jax
+counterfactuals: true
+data:
+  frozen_inputs: data/processed/inputs/synthetic_zero
+evaluation:
+  test_paths: 100
+execution: next_open
+experiment: ppo_synthetic_zero
+initial_wealth: 1000000
+kind: synthetic
+model:
+  batch_size: 256
+  clip_range: 0.2
+  ent_coef: 0.0
+  gae_lambda: 0.95
+  gamma: 0.99
+  learning_rate: 0.0003
+  max_grad_norm: 0.5
+  n_epochs: 10
+  n_steps: 2048
+  net_arch:
+  - 64
+  - 64
+  normalize_advantage: true
+  verbose: 0
+  vf_coef: 0.5
+observation_tickers:
+- SYNTH
+reward_scale: 100
+stage: primary
+study: ppo_attribution
+synthetic:
+  dgp: bounded_binary_markov
+  episode_steps: 512
+  initial_price: 100
+  persistence: 0.9
+  return_size: 0.02
+  signal_strength: 0.0
+  test_market_seed: 9001
+  test_steps: 2048
+  train_market_seed: 7001
+  train_steps: 4096
+  validation_market_seed: 8001
+  validation_steps: 2048
+temperature: 1.0
+tickers:
+- SYNTH
+total_timesteps: 5001216
+training:
+  checkpoint_interval_steps: 250000
+  memory_check_interval_steps: 2048
+  min_available_memory_gb: 8
+  console_metrics: false
+  progress_bar: true
+transaction_cost_bps: 10

@@ -1,0 +1,9 @@
+name: dtasrl-py313
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13.15
+  - pip
+  - pip:
+      - uv
+      - -e .[dev,notebook]

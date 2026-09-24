@@ -1,0 +1,53 @@
+algorithm: ppo
+backend: sbx_jax
+counterfactuals: true
+data:
+  frozen_inputs: data/processed/inputs/real
+  snapshot: data/processed/metadata.json
+execution: next_open
+experiment: ppo_multi_msft_jpm_jnj
+initial_wealth: 1000000
+kind: multi_asset
+model:
+  batch_size: 256
+  clip_range: 0.2
+  ent_coef: 0.0
+  gae_lambda: 0.95
+  gamma: 0.99
+  learning_rate: 0.0003
+  max_grad_norm: 0.5
+  n_epochs: 10
+  n_steps: 2048
+  net_arch:
+  - 64
+  - 64
+  normalize_advantage: true
+  verbose: 0
+  vf_coef: 0.5
+observation_tickers:
+- MSFT
+- JPM
+- JNJ
+reward_scale: 100
+split:
+  test_end: '2026-08-31'
+  test_start: '2020-01-01'
+  train_end: '2018-12-31'
+  train_start: '2009-01-01'
+  validation_end: '2019-12-31'
+  validation_start: '2019-01-01'
+stage: primary
+study: ppo_attribution
+temperature: 1.0
+tickers:
+- MSFT
+- JPM
+- JNJ
+total_timesteps: 5001216
+training:
+  checkpoint_interval_steps: 250000
+  memory_check_interval_steps: 2048
+  min_available_memory_gb: 8
+  console_metrics: false
+  progress_bar: true
+transaction_cost_bps: 10

@@ -1,7 +1,7 @@
 [project]
 name = "dtasrl"
 version = "0.1.0"
-description = "Identify dynamic trading and asset-selection effects in financial reinforcement learning."
+description = "Execution-consistent pathwise attribution of reinforcement-learning portfolios across 3-, 30-, and 100-stock universes."
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
 dependencies = [

@@ -1,6 +1,20 @@
-# Trading and Allocation in PPO Portfolios
+# Pathwise Attribution of Reinforcement Learning Portfolios
 
-This repository provides a reproducible workflow for attributing reinforcement-learning portfolio performance to initial allocation and subsequent trading. A complementary exposure-composition decomposition separates persistent stock selection, exposure timing, and changes in stock composition. The code includes data preparation, PPO training, counterfactual replays, and six Jupyter notebooks. Data, models, and experiment records are generated and retained locally; they are not bundled in the Git repository.
+This repository implements an execution-consistent pathwise attribution framework for reinforcement-learning portfolios. It separates the contribution of the initial allocation from subsequent trading and uses exposure-composition replays to distinguish persistent stock selection, exposure timing, and asset rotation. The empirical study evaluates PPO across 3-, 30-, and 100-stock universes, supported by synthetic-signal calibration and single-stock diagnostics.
+
+The six notebooks cover data preparation, training, and evaluation. Models, market data, and detailed experiment records are retained locally and are not bundled in the Git repository. The Python package and command-line entry point remain `dtasrl`.
+
+## Attribution framework
+
+For each realized portfolio path, net log wealth is `J(P) = log(V_T / V_0)`. All comparisons use the same dates, initial wealth, market prices, and self-financing transaction-cost accounting within a stock universe.
+
+| Contrast | Definition | Interpretation |
+| --- | --- | --- |
+| Initial allocation, A | `J(first-allocation hold) - J(equal-weight hold)` | Initial stock composition and cash allocation relative to same-universe equal weighting. |
+| Subsequent trading, D | `J(learned policy) - J(first-allocation hold)` | Later portfolio changes relative to holding the exact first executed allocation. |
+| Total excess log wealth | `A + D = J(learned policy) - J(equal-weight hold)` | An accounting identity checked before rounding. |
+
+First-allocation hold freezes actual adjusted units after the first execution; it does not keep weights constant. The complementary 2×2 exposure-composition replays separate persistent selection, dynamic exposure, and dynamic composition using their own cost-bearing reference paths. They answer a different attribution question and are not componentwise substitutes for A and D. Replays keep the observed market and decision paths fixed, rather than retraining or adapting a policy to counterfactual holdings.
 
 ## Study design
 
@@ -14,7 +28,13 @@ The complete study comprises 24 PPO models, each trained for 5,001,216 transitio
 | Joint allocation across the fixed Dow 30 and cash | 3 |
 | Joint allocation across 100 liquidity-selected stocks and cash | 3 |
 
-The joint comparisons use 3-, 30-, and 100-stock universes with the same features, PPO settings, execution convention, and controls. The base task planner covers the original 18 synthetic, single-stock, and three-stock tasks. The Dow 30 and 100-stock extensions have separate preparation, training, and report entry points; adding them does not overwrite earlier results. Comparisons across universes are descriptive, not isolated causal effects of stock count.
+The joint comparisons apply the same attribution definitions, feature construction, PPO settings, execution convention, and controls across 3, 30, and 100 stocks. Separate input and output directories preserve each experiment. Comparisons across universes are descriptive, not isolated causal effects of stock count.
+
+| Tradable universe | Source and construction |
+| --- | --- |
+| 3 stocks | MSFT, JPM, and JNJ, a fixed subset of the Dow archive. The single-stock diagnostics use these names separately. |
+| 30 stocks | All constituents of the fixed 2026-08-31 Dow archive. |
+| 100 stocks | A separate S&P 500 candidate archive, filtered and ranked using training-period history and liquidity. It is not the S&P 100 index. |
 
 Real-market training uses 2009–2018, with 2019 reserved for validation. The primary evaluation is 2020–2025; a continuous extension runs through 2026-08-31 without resetting holdings. The reference calendar spans 2008-03-19 through 2026-08-31. The Dow constituent list is fixed as of 2026-08-31 and applied retrospectively, so it is not a historical investable reconstruction of the index.
 
@@ -22,16 +42,22 @@ The 100-stock universe is selected from S&P 500 candidates cross-checked against
 
 All policies use a long-only, unleveraged target-weight environment with cash as an asset. Actions are chosen after the close and executed at the next open. The principal one-way transaction cost is 10 basis points. Evaluations preserve observations, actions, target and executed weights, rewards, fees, wealth, and counterfactual paths. First-allocation hold and Freeze-K retain actual units without further trading. Mean-exposure/composition replays are retrospective attribution tools, not deployable benchmarks. The chronological and exposure-composition decompositions use different references and should not be equated component by component.
 
+## Reported findings
+
+In the completed study, all nine joint policies underperform their first-allocation holds and same-universe equal-weight holds over 2020–2025 at a one-way cost of 10 basis points. Initial-allocation effects vary across policies, while dynamic composition is the dominant negative component in the larger portfolios. Cost replays reveal reversals, and the continuation through August 2026 includes horizon-dependent exceptions. The conclusion concerns the contribution of recorded portfolio decisions, not a claim that all reinforcement-learning trading has negative returns.
+
+These findings refer to the frozen study inputs and completed models. A fresh clone contains their implementation, not the saved empirical evidence; a new download or training run is a new execution and must be identified by its own hashes.
+
 ## Notebooks
 
 | Notebook | Purpose |
 | --- | --- |
 | `00_data_preparation_and_validation.ipynb` | Build or inspect raw, interim, processed, and frozen data. |
 | `01_synthetic_signal_validation.ipynb` | Check learning behavior under known and absent signals. |
-| `02_single_asset_timing.ipynb` | Evaluate the three single-stock policies. |
-| `03_multi_asset_attribution.ipynb` | Evaluate the matched three-stock joint policy and counterfactuals. |
-| `04_dow30_multi_asset_attribution.ipynb` | Evaluate the separate 30-stock joint-policy extension. |
-| `05_liquid100_multi_asset_attribution.ipynb` | Evaluate the training-selected 100-stock joint-policy extension. |
+| `02_single_asset_timing.ipynb` | Evaluate single-stock diagnostics for MSFT, JPM, and JNJ. |
+| `03_multi_asset_attribution.ipynb` | Evaluate 3-stock joint portfolios and matched single-stock diagnostics. |
+| `04_dow30_multi_asset_attribution.ipynb` | Evaluate 30-stock joint portfolios using the fixed Dow archive. |
+| `05_liquid100_multi_asset_attribution.ipynb` | Evaluate 100-stock joint portfolios using training-period liquidity selection. |
 
 Notebooks 01–05 default to `RUN_EXPERIMENTS = False`. Set the switch to `True` only when intentionally launching or resuming training; verified completed runs are skipped. Notebook 00 also disables downloads and preparation by default. Prepare the Dow data first. For the 100-stock experiment, enable its separate `PREPARE_LIQUID100` section in Notebook 00 before running Notebook 05. Preparation retains `liquid100_` files alongside the existing data layers and does not replace Dow data.
 
@@ -39,11 +65,14 @@ Kernel name: `dtasrl-py313`. Keep at most two formal training workers active and
 
 ## Installation
 
-Create the environment from the project root:
+Clone the repository and create the environment from its root:
 
 ```bash
+git clone https://github.com/tooichitake/Pathwise-Attribution-of-Reinforcement-Learning-Portfolios.git
+cd Pathwise-Attribution-of-Reinforcement-Learning-Portfolios
 conda env create -f environment.yml
 conda activate dtasrl-py313
+python -m ipykernel install --user --name dtasrl-py313 --display-name dtasrl-py313
 ```
 
 The project targets Python 3.13 and uses Stable Baselines Jax (SBX) for PPO. Dependency versions are recorded in `uv.lock`. The training backend uses JAX on CPU; Stable-Baselines3 supplies shared environment, logging, and callback interfaces.
@@ -56,20 +85,20 @@ Run commands from the project root. Data download requires network access; model
 # Rebuild the market-data layers when a new snapshot is intentionally required.
 dtasrl data build --config configs/data/dow30.yaml
 
-# Freeze the training-period scalers and inputs for the primary study.
+# Freeze inputs for the synthetic, single-stock, and 3-stock experiments.
 dtasrl data prepare
 
-# Inspect the fixed primary 18-task plan without starting training.
+# Inspect the base 18-task plan without starting training.
 dtasrl study plan
 
-# Run one primary model. Use --resume only for a matching interrupted run.
+# Run one model. Use --resume only for a matching interrupted run.
 dtasrl experiment run --config configs/experiments/synthetic_high.yaml --seed 101
 
-# Summarize complete, identity-checked primary runs.
+# Summarize complete, identity-checked runs in the base plan.
 dtasrl study summarize
 ```
 
-The extensions are not included in the base `dtasrl study plan` or `dtasrl study summarize`. Use Notebook 00 for preparation and Notebooks 04–05 for their training and reports. Their reusable modules are `scripts/dow30_extension.py` and `scripts/liquid100_extension.py`. Once the corresponding frozen inputs exist, an individual extension model can also be launched explicitly:
+The base `dtasrl study plan` and `dtasrl study summarize` commands manage 18 models: six synthetic, nine single-stock, and three 3-stock joint models. They do not aggregate the full 24-model study. The 30- and 100-stock experiments retain independent preparation, training, and reporting entry points. Use Notebook 00 for data preparation and Notebooks 04–05 for their training and reports, implemented by `scripts/dow30_extension.py` and `scripts/liquid100_extension.py`. Once the corresponding frozen inputs exist, an individual model can also be launched explicitly:
 
 ```bash
 dtasrl experiment run --config configs/experiments/multi_dow30.yaml --seed 101

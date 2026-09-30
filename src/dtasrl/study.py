@@ -1,4 +1,8 @@
-"""Preparation, planning, and read-only summarization for the current study."""
+"""Preparation and read-only reporting for the base 18-model attribution plan.
+
+The complete study also includes three 30-stock and three 100-stock models,
+prepared and reported independently by their joint-portfolio notebooks.
+"""
 
 from __future__ import annotations
 
@@ -82,7 +86,7 @@ def _equivalent_source_snapshot(run: Path, actual_hash: str, expected_hash: str)
 
 
 def prepare_inputs() -> dict:
-    """Freeze real/synthetic inputs and bind every active config to immutable artifacts."""
+    """Freeze real/synthetic inputs and bind the six base-condition configs to artifacts."""
     config_dir = PROJECT_ROOT / "configs/experiments"
     snapshot = "data/processed/metadata.json"
     multi = load_config(config_dir / "multi_asset.yaml")

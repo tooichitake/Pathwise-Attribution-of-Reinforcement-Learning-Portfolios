@@ -1,4 +1,4 @@
-"""Current study entrypoints. Historical workflows are preserved in archive/."""
+"""Data, training, and base-plan entry points for pathwise portfolio attribution."""
 
 from pathlib import Path
 from typing import Annotated
@@ -7,7 +7,7 @@ import typer
 
 from dtasrl.config import load_config
 
-app = typer.Typer(help="Local SBX portfolio study")
+app = typer.Typer(help="Pathwise attribution of reinforcement-learning portfolios")
 data_app = typer.Typer()
 experiment_app = typer.Typer()
 study_app = typer.Typer()
@@ -25,7 +25,7 @@ def data_build(config: Annotated[Path, typer.Option(exists=True, dir_okay=False)
 
 @data_app.command("prepare")
 def data_prepare():
-    """Freeze scalers and real/synthetic inputs used by all formal tasks."""
+    """Freeze scalers and inputs for the base 18-task plan; see Notebook 00 for larger universes."""
     from dtasrl.study import prepare_inputs
 
     typer.echo(prepare_inputs())
@@ -48,7 +48,7 @@ def experiment_run(
 
 @study_app.command("plan")
 def study_plan(output: Annotated[Path | None, typer.Option()] = None):
-    """Create the fixed 18-task plan without starting training."""
+    """Plan the 18 synthetic, single-stock, and 3-stock models without training."""
     from dtasrl.study import build_plan
 
     plan = build_plan(output)
@@ -57,7 +57,7 @@ def study_plan(output: Annotated[Path | None, typer.Option()] = None):
 
 @study_app.command("summarize")
 def study_summarize(plan: Annotated[Path | None, typer.Option(exists=True, dir_okay=False)] = None):
-    """Summarize complete matching runs and report readiness otherwise."""
+    """Summarize the base 18-task plan; larger universes have separate notebook reports."""
     from dtasrl.study import summarize
 
     result = summarize(plan)

@@ -1,4 +1,4 @@
-"""Isolated fixed 100-stock extension; no modifications to completed experiments.
+"""Preparation and reporting for 100-stock joint-portfolio attribution.
 
 Data preparation is initiated by Notebook 00. Notebook 05 reads the frozen
 inputs and starts training only when its explicit switch is enabled. The

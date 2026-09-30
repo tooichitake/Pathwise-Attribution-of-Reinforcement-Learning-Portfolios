@@ -1,4 +1,6 @@
-# Local data layout
+# Data for Pathwise Attribution of Reinforcement Learning Portfolios
+
+The real-market study uses two source archives and three tradable universes. The Dow archive supplies the MSFT/JPM/JNJ subset and the full 30-stock portfolio. The separate S&P 500 candidate archive supplies a training-liquidity-selected 100-stock portfolio. Candidate securities are not all traded, and the 100-stock universe is not the S&P 100. Synthetic inputs provide high-signal and zero-signal calibration markets.
 
 The project keeps the standard `raw / interim / processed` layers without an additional dataset-name or timestamp directory.
 

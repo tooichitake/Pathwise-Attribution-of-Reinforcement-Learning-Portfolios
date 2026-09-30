@@ -1,8 +1,9 @@
-"""Single-current-copy fixed-universe data and processed matched-task inputs.
+"""Fixed-universe market snapshots and training-only portfolio input preparation.
 
 Prices are total-return-adjusted units: dividends are already embedded and must
 not be credited a second time. Fractional adjusted units are not broker shares.
-All market features are shared by the single- and three-stock experiments.
+The feature definitions and execution convention are shared across the study;
+the single-stock diagnostics and 3-stock portfolios also share market inputs.
 """
 
 from __future__ import annotations

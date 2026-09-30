@@ -1,9 +1,9 @@
-"""Isolated 30-stock extension of the completed three-stock PPO study.
+"""Preparation and reporting for 30-stock joint-portfolio attribution.
 
-This module lives outside the primary study's fixed 18-task plan. It reuses
-the existing feature, execution, training, and attribution implementations.
-The completed primary run snapshots and their planned source hashes remain
-immutable; the optional output-directory router is backward compatible.
+The 30-stock experiment shares feature, execution, PPO, and attribution
+implementations with the 3- and 100-stock experiments. Its frozen inputs and
+outputs are separate; it is not part of the base 18-task planner. Existing
+model artifacts and planned source hashes are never rebound by this module.
 """
 
 from __future__ import annotations

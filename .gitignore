@@ -1,7 +1,17 @@
 __pycache__/
 *.py[cod]
 .ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.vscode/
+.ipynb_checkpoints/
+*.partial
 outputs/
+artifacts/
+paper/
+docs/
+tmp/
 data/raw/
 data/interim/
 data/processed/

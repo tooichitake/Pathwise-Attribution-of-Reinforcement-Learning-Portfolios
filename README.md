@@ -1,22 +1,26 @@
 # Trading and Allocation in PPO Portfolios
 
-This repository studies whether the outcomes of a reinforcement-learning portfolio policy are associated with exposure timing, persistent stock composition, or subsequent trading. It provides the market-data pipeline, frozen experiment inputs, PPO training code, counterfactual replays, Jupyter notebooks, and locally saved results.
+This repository provides a reproducible workflow for attributing reinforcement-learning portfolio performance to initial allocation and subsequent trading. A complementary exposure-composition decomposition separates persistent stock selection, exposure timing, and changes in stock composition. The code includes data preparation, PPO training, counterfactual replays, and six Jupyter notebooks. Data, models, and experiment records are generated and retained locally; they are not bundled in the Git repository.
 
 ## Study design
 
-The primary study consists of 18 PPO runs, each trained for 5,001,216 transitions with three prespecified random seeds:
+The complete study comprises 24 PPO models, each trained for 5,001,216 transitions. Every condition uses three random seeds:
 
 | Condition | Policies |
 | --- | ---: |
 | Synthetic market with a strong or zero predictive signal | 6 |
 | Single-stock trading in MSFT, JPM, or JNJ with cash | 9 |
 | Joint allocation across MSFT, JPM, JNJ, and cash | 3 |
+| Joint allocation across the fixed Dow 30 and cash | 3 |
+| Joint allocation across 100 liquidity-selected stocks and cash | 3 |
 
-A separate extension trains three joint policies over all 30 fixed Dow constituents and cash. It does not change the primary 18-run analysis. The extension compares policies within the 30-stock universe; it does not treat a difference from the three-stock policy as an isolated effect of universe size.
+The joint comparisons use 3-, 30-, and 100-stock universes with the same features, PPO settings, execution convention, and controls. The base task planner covers the original 18 synthetic, single-stock, and three-stock tasks. The Dow 30 and 100-stock extensions have separate preparation, training, and report entry points; adding them does not overwrite earlier results. Comparisons across universes are descriptive, not isolated causal effects of stock count.
 
-The real-data panel spans the first date on which all 30 selected stocks have valid data through 2026-08-31. The constituent list is fixed as of 2026-08-31 and applied retrospectively. It is therefore a controlled, survivorship-affected universe, not a historical investable reconstruction of the Dow.
+Real-market training uses 2009–2018, with 2019 reserved for validation. The primary evaluation is 2020–2025; a continuous extension runs through 2026-08-31 without resetting holdings. The reference calendar spans 2008-03-19 through 2026-08-31. The Dow constituent list is fixed as of 2026-08-31 and applied retrospectively, so it is not a historical investable reconstruction of the index.
 
-All policies use the same long-only, unleveraged target-weight execution convention with cash as an asset and transaction costs charged on traded value. The evaluation preserves daily observations, target and executed weights, rewards, costs, wealth, and counterfactual paths. Freeze-K and exposure-composition replays distinguish the initial allocation from subsequent adjustments. The test-period mean-composition paths are retrospective attribution tools, not deployable benchmarks.
+The 100-stock universe is selected from S&P 500 candidates cross-checked against IVV equity holdings. Eligibility requires pretraining history and at least 98% training-period coverage. One share class is retained per issuer, and eligible issuers are ranked by median raw Close × Volume over the final 252 training sessions ending in 2018. Neither validation nor test returns enter selection. This custom universe is not the S&P 100. Current candidate membership is retrospective and remains subject to survivorship bias. IVV is used only to verify membership, not as a traded asset or return benchmark.
+
+All policies use a long-only, unleveraged target-weight environment with cash as an asset. Actions are chosen after the close and executed at the next open. The principal one-way transaction cost is 10 basis points. Evaluations preserve observations, actions, target and executed weights, rewards, fees, wealth, and counterfactual paths. First-allocation hold and Freeze-K retain actual units without further trading. Mean-exposure/composition replays are retrospective attribution tools, not deployable benchmarks. The chronological and exposure-composition decompositions use different references and should not be equated component by component.
 
 ## Notebooks
 
@@ -27,8 +31,11 @@ All policies use the same long-only, unleveraged target-weight execution convent
 | `02_single_asset_timing.ipynb` | Evaluate the three single-stock policies. |
 | `03_multi_asset_attribution.ipynb` | Evaluate the matched three-stock joint policy and counterfactuals. |
 | `04_dow30_multi_asset_attribution.ipynb` | Evaluate the separate 30-stock joint-policy extension. |
+| `05_liquid100_multi_asset_attribution.ipynb` | Evaluate the training-selected 100-stock joint-policy extension. |
 
-Notebooks 01–04 default to `RUN_EXPERIMENTS = False`, so reopening them does not start training. Set the switch to `True` only when intentionally launching or resuming PPO jobs. Completed runs are skipped. The data notebook does not download new market data unless its rebuild switch is enabled.
+Notebooks 01–05 default to `RUN_EXPERIMENTS = False`. Set the switch to `True` only when intentionally launching or resuming training; verified completed runs are skipped. Notebook 00 also disables downloads and preparation by default. Prepare the Dow data first. For the 100-stock experiment, enable its separate `PREPARE_LIQUID100` section in Notebook 00 before running Notebook 05. Preparation retains `liquid100_` files alongside the existing data layers and does not replace Dow data.
+
+Kernel name: `dtasrl-py313`. Keep at most two formal training workers active and at least 8 GiB of available memory. Each extension runs its three seeds sequentially. Opening a notebook is not sufficient to supply missing data or results; the preparation and training steps must be explicitly enabled when required.
 
 ## Installation
 
@@ -62,7 +69,14 @@ dtasrl experiment run --config configs/experiments/synthetic_high.yaml --seed 10
 dtasrl study summarize
 ```
 
-The 30-stock extension has its own configuration, frozen inputs, notebook, and output directory. Its preparation and reporting code is in `scripts/dow30_extension.py`; it is not included in `dtasrl study summarize`.
+The extensions are not included in the base `dtasrl study plan` or `dtasrl study summarize`. Use Notebook 00 for preparation and Notebooks 04–05 for their training and reports. Their reusable modules are `scripts/dow30_extension.py` and `scripts/liquid100_extension.py`. Once the corresponding frozen inputs exist, an individual extension model can also be launched explicitly:
+
+```bash
+dtasrl experiment run --config configs/experiments/multi_dow30.yaml --seed 101
+dtasrl experiment run --config configs/experiments/multi_liquid100.yaml --seed 101
+```
+
+The displayed seed labels 1–3 correspond to random seeds 101, 202, and 303. Every run retains the actual random seed. Downloading a new candidate list may change membership and data hashes; reproducing an existing result requires its original frozen inputs and provenance, not merely a fresh download from the same URL.
 
 ## Data and results
 
@@ -74,6 +88,7 @@ outputs/
   02_single_asset/
   03_multi_asset/
   04_dow30/
+  05_liquid100/
   study_plan/
 ```
 
@@ -83,4 +98,4 @@ Yahoo Finance is the source of the market panel. Before redistributing downloade
 
 ## Public copy
 
-This copy keeps the five study notebooks, reproducible code and configuration, local data layers, and the saved outputs for all 21 completed runs. Draft manuscripts, internal planning notes, old research artifacts, debug utilities, and local test files are excluded. Large `data/` and `outputs/` trees are ignored by Git by default; review their size and redistribution rights before publishing them separately. The saved source snapshots and manifests identify the original training code and data, while portable paths in the public reports avoid relying on one workstation's directory layout.
+Tracked files contain the six notebooks, executable study code, data and experiment configurations, and dependency specifications. Executed notebook outputs and workstation metadata are removed. Market data, trained models, run logs, large result trees, manuscript drafts, internal planning notes, debugging utilities, and local test files are excluded. Consequently, cloning this repository does not download the 24 completed models or their research evidence. Results generated locally remain in the experiment-specific output folders and can be inspected without retraining. Before publishing data or derived outputs separately, verify redistribution rights and remove private metadata.

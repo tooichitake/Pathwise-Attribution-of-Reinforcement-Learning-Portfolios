@@ -1,0 +1,21 @@
+name: sp500_liquid100_fixed_universe
+candidate_list_url: https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv
+candidate_list_documentation: https://github.com/datasets/s-and-p-500-companies
+holdings_crosscheck_url: https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf/latest-holdings.csv
+reference_snapshot: data/processed/metadata.json
+start: '2008-01-01'
+end: '2026-09-01'
+expected_end: '2026-08-31'
+target_stocks: 100
+minimum_training_coverage: 0.98
+warmup_sessions: 64
+liquidity_sessions: 252
+duplicate_class_preference:
+  GOOG: GOOGL
+split:
+  train_start: '2009-01-01'
+  train_end: '2018-12-31'
+  validation_start: '2019-01-01'
+  validation_end: '2019-12-31'
+  test_start: '2020-01-01'
+  test_end: '2026-08-31'

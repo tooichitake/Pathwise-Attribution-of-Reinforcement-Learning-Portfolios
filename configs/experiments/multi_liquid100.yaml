@@ -1,0 +1,150 @@
+algorithm: ppo
+backend: sbx_jax
+counterfactuals: true
+data:
+  frozen_inputs: data/processed/inputs/liquid100
+  selection_audit: data/interim/liquid100_selection_audit.parquet
+  snapshot: data/processed/liquid100_metadata.json
+execution: next_open
+experiment: ppo_multi_liquid100
+initial_wealth: 1000000
+kind: multi_asset
+model:
+  batch_size: 256
+  clip_range: 0.2
+  ent_coef: 0.0
+  gae_lambda: 0.95
+  gamma: 0.99
+  learning_rate: 0.0003
+  max_grad_norm: 0.5
+  n_epochs: 10
+  n_steps: 2048
+  net_arch:
+  - 64
+  - 64
+  normalize_advantage: true
+  verbose: 0
+  vf_coef: 0.5
+observation_tickers: &id001
+- AAPL
+- ABT
+- ACN
+- ADBE
+- AMAT
+- AMD
+- AMGN
+- AMT
+- AMZN
+- AXP
+- BA
+- BAC
+- BIIB
+- BKNG
+- BLK
+- BMY
+- BRK-B
+- C
+- CAT
+- CI
+- CMCSA
+- CMG
+- COP
+- COST
+- CRM
+- CSCO
+- CSX
+- CVS
+- CVX
+- DAL
+- DD
+- DE
+- DIS
+- DUK
+- EBAY
+- ELV
+- EOG
+- F
+- FDX
+- GE
+- GILD
+- GOOGL
+- GS
+- HAL
+- HD
+- HON
+- IBM
+- INTC
+- ISRG
+- JNJ
+- JPM
+- KO
+- LLY
+- LMT
+- LOW
+- LRCX
+- MA
+- MCD
+- MDLZ
+- MDT
+- MMM
+- MO
+- MRK
+- MS
+- MSFT
+- MU
+- NEE
+- NFLX
+- NKE
+- NOC
+- NVDA
+- ORCL
+- OXY
+- PEP
+- PFE
+- PG
+- PM
+- PNC
+- QCOM
+- RTX
+- SBUX
+- SCHW
+- SLB
+- STZ
+- T
+- TGT
+- TJX
+- TMO
+- TXN
+- UNH
+- UNP
+- UPS
+- USB
+- V
+- VLO
+- VZ
+- WFC
+- WMT
+- WYNN
+- XOM
+output_group: 05_liquid100
+reward_scale: 100
+split:
+  test_end: '2026-08-31'
+  test_start: '2020-01-01'
+  train_end: '2018-12-31'
+  train_start: '2009-01-01'
+  validation_end: '2019-12-31'
+  validation_start: '2019-01-01'
+stage: extension
+study: ppo_attribution
+temperature: 1.0
+tickers: *id001
+total_timesteps: 5001216
+training:
+  checkpoint_interval_steps: 250000
+  console_metrics: false
+  memory_check_interval_steps: 2048
+  min_available_memory_gb: 8
+  progress_bar: true
+transaction_cost_bps: 10
+universe_selection_sha256: f1ad28b9834f06fe657edc5c4517fadebbf775286054ed8cdd1f9d1e1fb389bf
